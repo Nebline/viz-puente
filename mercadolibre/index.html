@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es-CL">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="robots" content="noindex" />
+    <title>Conectando con Viz ERP</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f7f7f5;
+        --text: #1d1d1b;
+        --muted: #5c5c57;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #161615;
+          --text: #f2f2ef;
+          --muted: #b3b3ad;
+        }
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 16px;
+        background: var(--bg);
+        color: var(--text);
+        font:
+          16px/1.5 system-ui,
+          sans-serif;
+      }
+      main {
+        max-width: 32rem;
+      }
+      p {
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Conectando con Viz ERP…</h1>
+      <p id="mensaje">Te estamos llevando de vuelta al panel.</p>
+    </main>
+    <script>
+      // Página puente para trabajar en local: Mercado Libre exige una dirección de vuelta https fija, y la
+      // API corre en http://localhost:4000. Esta página solo reenvía el código y el estado a la API local.
+      // El código no sirve sin el secreto de la aplicación ni el verificador PKCE, que nunca salen del
+      // servidor. Ver docs/mercadolibre.md.
+      (function () {
+        var DESTINO = 'http://localhost:4000/v1/integrations/mercadolibre/callback';
+        var entrada = new URLSearchParams(window.location.search);
+        var salida = new URLSearchParams();
+        ['code', 'state', 'error', 'error_description'].forEach(function (clave) {
+          var valor = entrada.get(clave);
+          if (valor) salida.set(clave, valor);
+        });
+        if (!salida.has('state')) {
+          document.getElementById('mensaje').textContent =
+            'Esta página solo sirve al conectar Mercado Libre desde el panel de Viz ERP.';
+          return;
+        }
+        window.location.replace(DESTINO + '?' + salida.toString());
+      })();
+    </script>
+  </body>
+</html>
